@@ -11,8 +11,9 @@ function execlist() {
     s.html("123");
     oEx = new TimeControlEx();
     oEx.add(2000, function () {
-        //s.html("we are the world"+(new Date).toString());
-        alert((new Date).toLocaleDateString());
+        var d = new Date();
+        s.html("we are the world" + d.toLocaleDateString() + " " + d.toLocaleTimeString());
+        //alert((new Date).toLocaleDateString());
     }, 'mj', 3);
 
 }

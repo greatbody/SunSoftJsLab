@@ -8,7 +8,7 @@
     <style type="text/css">
         .my
         {
-            width: 100px;
+            width: 300px;
             height: 20px;
             line-height: 20px;
             background-color: #ffe4c4;
