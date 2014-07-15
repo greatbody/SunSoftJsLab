@@ -18,6 +18,15 @@ function execlist() {
     //        //alert((new Date).toLocaleDateString());
     //    }, 'mj', 3);
 
+
+    TimerEx.add(2000, function () {
+        var d = new Date();
+        seter('time1').html("we are the world:" + d.toLocaleDateString() + " " + d.toLocaleTimeString());
+    }, 'mj', 3);
+
+
+
+
 }
 
 function seter(sId) {
@@ -142,3 +151,118 @@ function TimerManager() {
         nTimerId = 0;
     };
 }
+
+var Timer = {
+    nTimer: 0,
+    SetTimer: function (nSec, oFunc) {
+        nTimer = setInterval(oFunc, nSec);
+
+    },
+    CloseTimer: function () {
+        if (nTimer == 0) return;
+        clearInterval(nTimer);
+        nTimer = 0;
+    }
+};
+
+var TimerEx = {
+    nCount: 0,
+    oTimerIDs: [],
+    that: this,
+    nTimerId: 0,
+    ExecOnce: function (funcid) {
+        if (oTimerIDs[funcid].Limit == 0) {
+            //只要归零了，肯定是定时的，对于这种，就得关闭
+            clearInterval(oTimerIDs[funcid].TimerID);
+        }
+    },
+    add: function (nSec, oFunction, sName, nTimes) {
+        ///<param name="nSec">延迟时间，毫秒</param>
+        ///<param name="oFunction">调用函数</param>
+        ///<param name="sName">定时器名称（可选）</param>
+        ///<param name="nTimes">循环次数（可选）</param>
+        //todo:根据各个参数来创建，基础的参数是nSec和oFunction
+        var nParams = arguments.length;
+        var obj;
+        var nMyCount = TimerEx.nCount;
+        switch (nParams) {
+            case 2:
+                //两个参数，自动增加
+                nTimerId = setInterval(oFunction, nSec);
+                obj = {
+                    ID: nMyCount,
+                    TimerID: nTimerId,
+                    Name: String(nCount),
+                    Interval: nSec,
+                    Limit: -1
+                };
+                TimerEx.oTimerIDs.push(obj);
+                break;
+            case 3:
+                //三个参数
+                nTimerId = setInterval(oFunction, nSec);
+                obj = {
+                    ID: nMyCount,
+                    TimerID: nTimerId,
+                    Name: sName,
+                    Interval: nSec,
+                    Limit: -1
+                };
+                TimerEx.oTimerIDs.push(obj);
+                break;
+            case 4:
+                //四个参数
+                obj = {
+                    ID: nMyCount,
+                    TimerID: 0,
+                    Name: sName,
+                    Interval: nSec,
+                    Limit: nTimes
+                };
+                var oFunc = function (oThis, oMyFunc) {
+                    var oThat = oThis;
+                    var oMyFun = oMyFunc;
+                    var oRun = function () {
+                        if (oThat.Limit > 0 || oThat.Limit == -1) {
+                            oMyFun(); //执行传入的函数
+                            if (oThat.Limit > 0) oThat.Limit--;
+                        } else {
+                            //自行了断
+                            clearInterval(oThat.TimerID);
+                        }
+                    };
+                    return oRun;
+                };
+                nTimerId = setInterval(oFunc(obj, oFunction), nSec);
+                obj.TimerID = nTimerId;
+                TimerEx.oTimerIDs.push(obj);
+                break;
+            default:
+                return;
+        }
+    },
+    CloseTimer: function (sTimerName) {
+        ///<param name="sTimerName">计时器的名字，或ID</param>
+        if (typeof (sTimerName) == "number") {
+            //按照数字方法关闭
+            for (var j = 0; j < oTimerIDs.length; j++) {
+                if (oTimerIDs[j].ID == sTimerName) {
+                    clearInterval(oTimerIDs[j].TimerID);
+                    oTimerIDs = oTimerIDs.splice(j, 1);
+                    nCount--;
+                    break;
+                }
+            }
+        } else {
+            //按照字符串方式关闭
+            for (var m = 0; m < oTimerIDs.length; m++) {
+                if (oTimerIDs[m].Name == sTimerName) {
+                    clearInterval(oTimerIDs[m].TimerID);
+                    oTimerIDs.splice(m, 1);
+                    nCount--;
+                    break;
+                }
+            }
+        }
+    }
+};
